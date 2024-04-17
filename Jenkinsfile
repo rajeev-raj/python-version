@@ -1,45 +1,38 @@
 pipeline {
     agent any
 
+    environment {
+        // Declare an environment variable for Python version
+        PYTHON_VERSION = ''
+    }
+
     stages {
-        stage('Check Python Version - Stage 1') {
+        stage('Initialize Environment') {
             steps {
                 script {
-                    sh 'echo "Stage 1: Checking Python version"'
-                    sh 'python --version || python3 --version'
+                    // Call the custom method to set up the Python version environment variable
+                    setupPythonVersion()
                 }
             }
         }
-        
-        stage('Check if config.xml is present') {
+
+        stage('Use Python Version') {
             steps {
-                script {
-                        
-                        if(fileExists('../config.xml')) {
-                        echo "config.xml file is present."
-                        } 
-                        else 
-                        {
-                        echo "config.yaml file is not present."
-                        error("config.yaml file is missing.")
-                    }
-                }
-            }
-        }
-        
-        stage('Check Python Version - Stage 3') {
-            steps {
-                script {
-                    sh 'echo "Stage 3: Checking Python version"'
-                    sh 'python --version || python3 --version'
-                }
+                // Use the environment variable in your pipeline
+                echo "Using Python Version: ${env.PYTHON_VERSION}"
             }
         }
     }
+}
+
+// Define a method to read and set the Python version from a YAML file
+def setupPythonVersion() {
+    // Read the YAML configuration file
+    def configFile = readYaml file: 'config.yaml'
     
-    post {
-        always {
-            echo 'Finished checking Python versions across stages.'
-        }
-    }
+    // Update environment variable for Python version
+    env.PYTHON_VERSION = configFile.pythonVersion
+
+    // Optionally, log the Python version to check it's set
+    echo "Python Version set to: ${env.PYTHON_VERSION}"
 }
