@@ -14,7 +14,8 @@ pipeline {
         stage('Check if config.xml is present') {
             steps {
                 script {
-                        if(fileExists('config.xml')) {
+                        
+                        if(fileExists('../config.xml')) {
                         echo "config.xml file is present."
                         } 
                         else 
